@@ -7,13 +7,13 @@ struct cliente{
 
     float saldo;
 
-    int pass[10];
+    int passCliente;
     
-    char nome;
+    char nomeCliente[50];
 
     char morada[50];
 
-    char nif[9];// talves int?
+    int nif;// talves int?
 
     struct cliente* seguinte;
 
