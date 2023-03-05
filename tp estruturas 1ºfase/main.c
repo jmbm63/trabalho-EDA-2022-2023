@@ -7,31 +7,59 @@
 
 int main(){
 
-    
-    struct gestor* Gestores=malloc(sizeof(struct gestor));
-    struct cliente* Clientes=malloc(sizeof(struct cliente));
+    // incializacao das lista a NULL
+    struct gestor* Gestores=NULL;
+    struct cliente* Clientes=NULL;
     //struct maquina* Meios=malloc(sizeof(struct maquina));
 
-   
-    
-    
-    
 
+// Leitura dos ficheiros
+    readFile(&Gestores);
+    abrirFicheiro(&Clientes);
+    
     int confirmar;
     int gest; // para os gestores
     int opCliente;// para os clientes
+    char login[20];
+    int passLogin;
 
-    printf("Iniciar sessão como: \n");
-    printf("1 Gestor: \n2 Cliente:\n ");
+
+    struct gestor* temp = Gestores;
+    struct cliente* tempCliente = Clientes;
+
+
+    printf("\nIniciar sessão como: \n");
+    printf("1->Gestor: \n2->Cliente:\n3->Criar Conta:\n");
     scanf("%d",&confirmar);
    
     switch (confirmar) {
         case 1:
 
-            printf("Escolha a operacao:\n1 Criar Gestor: \n2 Remover Gestor:\n3 Alterar Gestor: "); 
-            scanf("%d",&gest);
-            //abrirFicheiro(Clientes);
-            readFile(Gestores);
+            // Codigo para o Log-in dos Gestores
+            printf("Faca o seu log-in: ");
+            scanf("%s",login);
+            printf("Indique a pass: ");
+            scanf("%d",&passLogin);
+ 
+            // Percorrer a lista dos Gestores
+            while(temp!=NULL){ 
+
+                if(strcmp(login,temp->nomeGestor)==0 && passLogin==temp->passGestor){
+            
+                    printf("Login feito com sucesso\nEscolha a operacao:\n1->Criar Gestor: \n2->Remover Gestor:\n3->Alterar Gestor:\n4->Remover Cliente: "); 
+                    scanf("%d",&gest);
+                    break;
+                }
+                temp=temp->seguinte;
+            }
+            if(temp==NULL){// caso o Gestor nao exista
+                printf("PassWord ou Nome de utilizador Invalidos!");
+            }
+           
+ /**
+ * @brief Implementacao de um Menu para os Gestores
+ * 
+ */
             switch(gest){
                 case 1:
                     criarGestor(&Gestores);
@@ -46,48 +74,68 @@ int main(){
                 break;
 
                 case 4:
-                  //  removerCliente(&Gestores,&Clientes);
-                  break;
+                    removerCliente(&Clientes);
+                break;
 
             }
         break;
 
-        case 2: // para os clientes
-            printf("Escolha a operacao:\n1->Criar Cliente: \n2->Apagar Conta:\n3->Alugar Meio de Mobilizacao:\n4->Consultar saldo:");
-            scanf("%d",&opCliente);
+        // para os clientes
+        case 2: 
 
+            // Codigo para o Log-in dos Clientes
+            printf("Faca o seu log-in: ");
+            scanf("%s",login);
+            printf("Indique a pass: ");
+            scanf("%d",&passLogin);
+ 
+            // percorrer a lista dos Clientes
+            while(tempCliente!=NULL){
+                if(strcmp(login,tempCliente->nomeCliente)==0 && passLogin==tempCliente->passCliente){
+
+                    printf("Login feito com sucesso!\nEscolha a operacao:\n1->Apagar Conta:\n2->Alugar Meio de Mobilizacao:\n3->Consultar saldo:");
+                    scanf("%d",&opCliente);
+                    break; // para sair do while
+                }
+                tempCliente=tempCliente->seguinte;
+            }  
+            if(tempCliente==NULL){ // caso o cliente não exista
+                printf("PassWord ou Nome de utilizador Invalidos!");
+            }
+
+/**
+ * @brief Implementacao de um Menu para os clientes
+ * 
+*/
             switch(opCliente){
                 
-                // Criar Conta
-                case 1:
-
-                    criarCliente(&Clientes);
-
-                break;
-                
                 // Apagar Conta
-                case 2:
-
+                case 1:
+                    apagarConta(&Clientes,login);
 
                 break;    
 
                 // Alugar meio
-                case 3:
+                case 2:
 
                 break;
 
-                // Consultar Saldo
-                case 4:
-
+                // Consultar Saldo/Acrescentar saldo
+                case 3:
+                    acrescentarSaldo(&Clientes,login);
                 break;
 
             }
+        break;
 
-
-
-
+/**
+* @brief para os utilizadores novos e dada a opcao de criar conta
+* 
+*/
+        case 3:
+        // Criar Conta para os clientes 
+            criarCliente(&Clientes);
         break;
     }
     return 0;
-
 }

@@ -2,19 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 struct cliente{
+
+    char nomeCliente[50];
+
+    int passCliente;
 
     float saldo;
 
-    int passCliente;
-    
-    char nomeCliente[50];
+    int nif;
 
     char morada[50];
-
-    int nif;// talves int?
-
+    
     struct cliente* seguinte;
 
 };
@@ -36,14 +35,10 @@ struct maquinas{
     int bateria;
 
     float preco;
+
+    int autonomia;
     
     char localizacao[25];
 
     struct maquinas* seguinte;
 };
-
-
-
-
-
-

@@ -3,9 +3,10 @@
 #include <string.h>
 #include "struct.h"
 #include "gestores.h"
+#include "clientes.h"
 
+// leitura do ficheiro e insercao na lista ligada
 void readFile(struct gestor** Gestores){
-
     FILE *file;
     file = fopen("dados Gestores.txt", "r");
 
@@ -24,24 +25,25 @@ void readFile(struct gestor** Gestores){
         fscanf(file,"%s",linha);
         token=strtok(linha,";");
         strcpy(nodo->nomeGestor, token);
-        printf("%s",nodo->nomeGestor);
+        printf("%s;",nodo->nomeGestor);
 
         fscanf(file,"%s",linha);
-        token=strtok(NULL,";\n");
+        token=strtok(linha,";");
         nodo->passGestor=atoi(token);
-        printf("%d",nodo->passGestor);
+        printf("%d\n",nodo->passGestor);
 
         nodo->seguinte = malloc(sizeof(struct gestor));
         nodo = nodo->seguinte;        
     }
-    //nodo->seguinte = NULL;
+    nodo->seguinte = NULL;
     fclose(file);
 }
 
-void atualizarFicheiro(struct gestor** Gestores,int passTemp,char nomeTemp[50]){
+// atualizaçao do ficheiro de texto
+void atualizarFicheiro(struct gestor** Gestores){
 
     FILE* file;
-    file=fopen("dados Gestores.txt","a");// a, acrescenta no fim do ficheiro
+    file=fopen("dados Gestores.txt","w");// a, acrescenta no fim do ficheiro
 
     char *token;
     char linha[20];
@@ -50,11 +52,10 @@ void atualizarFicheiro(struct gestor** Gestores,int passTemp,char nomeTemp[50]){
 
     struct gestor*nodo=*Gestores; // inicio da lista
 
-    if(!feof(file)){
-        fprintf(file,"%s;%d",nodo->nomeGestor,nodo->passGestor);
+    while(!feof(file) && nodo!=NULL){
+        fprintf(file,"%s;\n%d;\n",nodo->nomeGestor,nodo->passGestor);
+        nodo=nodo->seguinte;
     }
-
-    fprintf(file, "\n%s;%d;", nomeTemp, passTemp);
 
     fclose(file);
 }
@@ -80,49 +81,70 @@ void criarGestor(struct gestor** Gestores){
     
     *Gestores = nodo;
 
-    atualizarFicheiro(&Gestores,passTemp,nomeTemp);
+    atualizarFicheiro(Gestores);
 }
 
 // Remover gestor
 void removerGestor(struct gestor** Gestores){
 
-    struct gestor* nodo = *Gestores,*anterior; // gestores é a referencia 
-    //struct gestor* nodoAnterior = NULL; // inicializa o nó anterior a NULL
-
-    
     char nomeRemover[50]; // nome a remover
 
-    printf("Qual é o cliente que pretende remover? ");
+    printf("\nQual é o gestor que pretende remover? ");
     scanf("%s", nomeRemover);
-   
-   // se o nodo atual ja for o gestor a ser eliminado
-    if(nodo!=NULL && strcmp(nodo->nomeGestor,nomeRemover)==0){//strcmp retorna 0 se as duas strings forem iguais
 
-        *Gestores=nodo->seguinte;
-        free(nodo);
-        return;
-    }
+    /* struct gestor* temp = *Gestores;// leva me para o inicio da lista
+    while(temp!=NULL){// percorre a lista -> confirmação que os dados estao sendo inseridos
 
-    // percorre a lista e procura pelo gestor a ser removido
-    while(nodo!=NULL && strcmp(nodo->nomeGestor,nomeRemover)!=0){
-        printf("%s",nodo->nomeGestor);
-        anterior=nodo;
+        printf("Este PRINT%s;%d;\n",temp->nomeGestor,temp->passGestor);
+        temp=temp->seguinte;
+
+    }  
+     // percorre a lista e procura pelo gestor a ser removido
+    while(nodo!=NULL){
+        printf("1::::::%s\n",nodo->nomeGestor);
+        // se o nodo atual ja for o gestor a ser eliminado
+        if(strcmp(nodo->nomeGestor,nomeRemover)==0){
+            printf("2::::::%s\n",nodo->nomeGestor);
+            *Gestores=nodo->seguinte;
+            free(nodo);
+            return;
+           
+        }
+        printf("3::::::%s\n",nodo->nomeGestor);
+        //anterior=nodo;
         nodo=nodo->seguinte;
-    }
+    }*/
 
-    // se o gestor nao estiver presente na lista de gestores
-    if(nodo==NULL){
-        printf("Esse gestor nao existe!");
-        return;
-    }
+    
+    struct gestor* Temp;
 
-    anterior->seguinte=nodo->seguinte;
+    if(strcmp((*Gestores)->nomeGestor,nomeRemover)==0){
+        Temp=*Gestores;
+        *Gestores=(*Gestores)->seguinte;
+        free(Temp);
+    }else{
 
-    free(nodo); // liberta a memória alocada pelo nó removido
+        struct gestor* nodo = *Gestores;
+
+        while(nodo->seguinte!=NULL){
+
+            if(strcmp(nodo->seguinte->nomeGestor,nomeRemover)==0){
+
+                Temp=nodo->seguinte;
+                nodo->seguinte=nodo->seguinte->seguinte;
+                free(Temp);
+                break;
+            }else{
+                nodo=nodo->seguinte;
+            }
+        }
+    }      
     // Atualiza o ficheiro de gestores
-    // atualizarFicheiro(Gestores);
+    atualizarFicheiro(Gestores);
 }
 
+
+// alterar informacao de um gestor
 void alterarGestor(struct gestor** Gestores){
 
     struct gestor*nodo=*Gestores;
@@ -130,7 +152,6 @@ void alterarGestor(struct gestor** Gestores){
     int operacao; 
     char novoNome[50];
     char nomeRemover[50];
-    int oldPass;
     int novaPass;
 
     printf("O que pretende fazer:\n1->alterar nome:\n2->alterar password:");
@@ -152,24 +173,71 @@ void alterarGestor(struct gestor** Gestores){
             
             strcpy(nodo->nomeGestor, novoNome);
 
+            struct gestor* temp = *Gestores;// leva me para o inicio da lista
+            while(temp!=NULL){// percorre a lista -> confirmação que os dados estao sendo inseridos
+
+            printf("\n%s;%d;",temp->nomeGestor,temp->passGestor);
+            temp=temp->seguinte;
+            }
+
             //atualizarFicheiro(); //CONFIRMAR DEPOIS
         break;
 
         // alterar a Password
         case 2:
             printf("Qual é a password do gestor que prentede alterar:");
-            scanf("%d",oldPass);
+            scanf("%s",nomeRemover);
             printf("Qual é a nova pass:");
-            scanf("%d",novaPass);
+            scanf("%d",&novaPass);
 
-            while(oldPass!=nodo->passGestor){ // se forem diferentes retorna um valor !0
+            while(strcmp(nodo->nomeGestor, nomeRemover) != 0){ // se forem diferentes retorna um valor !0
                 nodo=nodo->seguinte;
             }
-            
             nodo->passGestor=novaPass;
-
-            //atualizarFicheiro(); // CONFIRMAR DEPOIS
-
+             
         break;
+        }
+    atualizarFicheiro(Gestores);
+}  
+    
+// remover um clientes
+void removerCliente(struct cliente** Clientes){
+
+    char clienteRemover[50];
+
+    printf("\nCliente a remover:");
+    scanf("%s",clienteRemover);
+
+    struct cliente* temp;
+    
+    if(strcmp((*Clientes)->nomeCliente,clienteRemover)==0){
+        temp=*Clientes;
+        *Clientes=(*Clientes)->seguinte;
+        free(temp);
+    }else{
+        struct cliente* nodo=*Clientes;
+
+        while(nodo->seguinte!=NULL){
+
+            if(strcmp(nodo->seguinte->nomeCliente,clienteRemover)==0){
+
+                temp=nodo->seguinte;
+                nodo->seguinte=nodo->seguinte->seguinte;
+                free(temp);
+            }
+            nodo=nodo->seguinte;
+        }
     }
-}
+
+    // Imprimir a lista atualizada
+/*      struct cliente* ala = *Clientes;
+    while(ala!=NULL){
+        printf("\n%s;\n%d;\n%.2f;\n%d;\n%s;",ala->nomeCliente,ala->passCliente,ala->saldo,ala->nif,ala->morada);
+        ala=ala->seguinte;
+    }  */
+     
+    atualizarFicheiroCliente(Clientes);
+} 
+    
+
+
