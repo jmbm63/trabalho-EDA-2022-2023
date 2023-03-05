@@ -1,0 +1,207 @@
+void readFile(struct gestor* Gestores){
+
+    FILE* file;
+    file=fopen("dados Gestores.txt","r");
+
+    struct gestor* nodo = malloc(sizeof(struct gestor)); // inicio da lista    
+    // Aqui, você precisa atribuir o endereço do primeiro nodo à variável Gestores
+    // para que possa acessá-lo fora dessa função
+    Gestores = nodo;
+
+    char linha[20];
+    char *token;
+
+    if (file==NULL){
+        printf("Erro na abertura do ficheiro");
+        exit(1);
+    }
+    while(!feof(file)){   
+        fscanf(file,"%s",linha);
+        token=strtok(linha,";\n");
+        strcpy(nodo->nomeGestor, token);
+
+        fscanf(file,"%s",linha);
+        token=strtok(NULL,";\n");
+        nodo->passGestor=atoi(token);
+
+        // Aqui, você precisa alocar um novo espaço de memória para o próximo nodo 
+        // e apontar o ponteiro seguinte do nodo atual para o novo nodo alocado
+        nodo->seguinte = malloc(sizeof(struct gestor));
+        nodo = nodo->seguinte;
+    }
+    // Aqui, você precisa definir o ponteiro seguinte do último nodo como NULL para indicar o final da lista
+    nodo->seguinte = NULL;
+    
+    fclose(file);
+}
+
+void atualizarFicheiro(struct gestor** Gestores,int passTemp,char nomeTemp[50]){
+
+    FILE* file;
+    file=fopen("dados Gestores.txt","a");
+
+    char *token;
+    char linha[20];
+
+    struct gestor*nodo=*Gestores; // Aqui, você não precisa usar o endereço do ponteiro Gestores, mas sim seu conteúdo
+    // Como Gestores é um ponteiro para um ponteiro, você precisa usar o operador de desreferência duas vezes
+    // para obter o endereço do primeiro nodo e depois acessar sua estrutura
+    if(!feof(file)){
+        fprintf(file,"%s;%d",nodo->nomeGestor,nodo->passGestor);
+    }
+
+    fprintf(file, "\n%s;%d;", nomeTemp, passTemp);
+
+    fclose(file);
+}
+
+// criar um novo gestor
+void criarGestor(struct gestor** Gestores){
+
+    struct gestor* nodo = malloc(sizeof(struct gestor));
+    // Como Gestores é um ponteiro para um ponteiro, você precisa usar o operador de desreferência
+    // uma vez para obter o endereço do primeiro nodo e depois acessar sua estrutura
+    char nomeTemp[50]; // nome do utilizador a criar
+    int passTemp;  // password do utilizador a criar
+
+    printf("Qual é o nome do novo gestor: ");
+    scanf("%s",nomeTemp);
+    printf("Indique a sua password: ");
+    scanf("%d",&passTemp);
+
+    strcpy(nodo->nomeGestor,nomeTemp);
+    nodo->passGestor = passTemp;
+    printf("%d",nodo->passGestor);
+
+    // Aqui, você precisa apontar o ponteiro seguinte do novo nodo para o endereço do primeiro nodo da lista
+    nodo->seguinte = *Gestores;
+    
+    // E então, atribuir o endereço do novo nodo à variável Gestores para atualizar o primeiro nodo
+
+// Remover gestor
+void removerGestor(struct gestor** Gestores){
+
+    struct gestor* nodo=*Gestores; // início da lista
+    struct gestor* anterior=NULL;
+    char nomeRemover[50]; // nome a remover
+
+    printf("Qual é o gestor que pretende remover: ");
+    scanf("%s",nomeRemover);
+
+    while(nodo!=NULL&&strcmp(nodo->nomeGestor,nomeRemover)!=0){
+        anterior=nodo;
+        nodo=nodo->seguinte;
+    }
+
+    if(nodo==NULL){ // não encontrou o gestor
+        printf("O gestor %s não existe.\n",nomeRemover);
+    }else{
+        if(anterior==NULL){ // remove o primeiro gestor
+            *Gestores=nodo->seguinte;
+        }else{
+            anterior->seguinte=nodo->seguinte;
+        }
+
+        free(nodo);
+        printf("Gestor %s removido com sucesso.\n",nomeRemover);
+    }
+    atualizarFicheiro(Gestores, -1, ""); // atualiza o ficheiro, removendo o gestor
+}
+
+// alterar cliente
+void alterarCliente(struct cliente** Clientes){
+
+    struct cliente*nodo=*Clientes;
+
+    int operacao;
+    char novoNome[50];
+    char nomeRemover[50];
+    char novaMorada[50];
+    int novoNIF;
+    int novoContacto;
+
+    printf("O que pretende fazer:\n1->alterar nome:\n2->alterar NIF:\n3->alterar contacto:\n4->alterar morada:");
+    scanf("%d",&operacao);
+
+    switch (operacao){
+
+        // Alterar nome do cliente
+        case 1:
+
+            printf("Qual é o nome do cliente que prentede alterar:");
+            scanf("%s",nomeRemover);
+            printf("Qual é o novo nome:");
+            scanf("%s",novoNome);
+
+            while(strcmp(nomeRemover, nodo->nomeCliente) != 0){ // se forem diferentes retorna um valor !0
+                nodo=nodo->seguinte;
+            }
+            
+            strcpy(nodo->nomeCliente, novoNome);
+
+            //atualizarFicheiro(); //CONFIRMAR DEPOIS
+        break;
+
+        // Alterar NIF do cliente
+        case 2:
+            printf("Qual é o nome do cliente que prentede alterar:");
+            scanf("%s",nomeRemover);
+            printf("Qual é o novo NIF:");
+            scanf("%d",&novoNIF);
+
+            while(strcmp(nomeRemover, nodo->nomeCliente) != 0){ // se forem diferentes retorna um valor !0
+                nodo=nodo->seguinte;
+            }
+            
+            nodo->NIF = novoNIF;
+
+            //atualizarFicheiro(); // CONFIRMAR DEPOIS
+
+        break;
+
+        // Alterar contacto do cliente
+        case 3:
+            printf("Qual é o nome do cliente que prentede alterar:");
+            scanf("%s",nomeRemover);
+            printf("Qual é o novo contacto:");
+            scanf("%d",&novoContacto);
+
+            while(strcmp(nomeRemover, nodo->nomeCliente) != 0){ // se forem diferentes retorna um valor !0
+                nodo=nodo->seguinte;
+            }
+            
+            nodo->contacto = novoContacto;
+
+            //atualizarFicheiro(); // CONFIRMAR DEPOIS
+
+void removerCliente(struct gestor** Gestores, struct cliente** Clientes){
+
+    struct cliente* nodo = *Clientes; // primeiro nó da lista
+    struct cliente* nodoAnterior = NULL; // inicializa o nó anterior como NULL
+    char nomeRemover[50]; // nome do cliente a remover
+
+    printf("Qual é o cliente que pretende remover: ");
+    scanf("%s", nomeRemover);
+
+    while (nodo != NULL && strcmp(nodo->nomeCliente, nomeRemover) != 0) {
+        nodoAnterior = nodo; // guarda o nó anterior
+        nodo = nodo->seguinte; // avança para o próximo nó
+    }
+
+    if (nodo == NULL) {
+        printf("O cliente \"%s\" não existe!\n", nomeRemover);
+        return;
+    }
+
+    // Remove o nó
+    if (nodoAnterior == NULL) { // primeiro nó
+        *Clientes = nodo->seguinte; // atualiza a cabeça da lista
+    } else {
+        nodoAnterior->seguinte = nodo->seguinte; // remove o nó da lista
+    }
+
+    free(nodo); // liberta a memória alocada pelo nó removido
+
+    // Atualiza o ficheiro de clientes
+    atualizarFicheiroClientes(Clientes);
+}
