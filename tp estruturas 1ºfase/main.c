@@ -4,19 +4,22 @@
 #include "struct.h"
 #include "gestores.h"
 #include "clientes.h"
+#include "meio.h"
+
 
 int main(){
 
     // incializacao das lista a NULL
     struct gestor* Gestores=NULL;
     struct cliente* Clientes=NULL;
-    //struct maquina* Meios=malloc(sizeof(struct maquina));
-
-
-// Leitura dos ficheiros
+    struct meios* Meios=NULL;
+   
+    // Leitura dos ficheiros
     readFile(&Gestores);
     abrirFicheiro(&Clientes);
-    
+    lerFicheiro(&Meios);
+
+    // variaveis auxiliares    
     int confirmar;
     int gest; // para os gestores
     int opCliente;// para os clientes
@@ -26,12 +29,20 @@ int main(){
 
     struct gestor* temp = Gestores;
     struct cliente* tempCliente = Clientes;
+    
 
+    ordemDecrescente(&Meios);
 
-    printf("\nIniciar sessão como: \n");
-    printf("1->Gestor: \n2->Cliente:\n3->Criar Conta:\n");
+    struct meios*nodo_Atual=Meios;
+    while(nodo_Atual!=NULL){
+        printf("\n%s;%d;%.2f;%d;%s;%s",nodo_Atual->meios,nodo_Atual->bateria,nodo_Atual->preco,nodo_Atual->autonomia,nodo_Atual->localizacao,nodo_Atual->estado);
+        nodo_Atual=nodo_Atual->seguinte;
+    }
+ 
+    printf("\nIniciar sessão como: \n1->Gestor: \n2->Cliente:\n3->Criar Conta:\n");
     scanf("%d",&confirmar);
-   
+    system("cls"); // para eliminar os prints anteriores
+
     switch (confirmar) {
         case 1:
 
@@ -40,14 +51,19 @@ int main(){
             scanf("%s",login);
             printf("Indique a pass: ");
             scanf("%d",&passLogin);
- 
+            system("cls"); // para eliminar os prints anteriores
+    
             // Percorrer a lista dos Gestores
             while(temp!=NULL){ 
 
                 if(strcmp(login,temp->nomeGestor)==0 && passLogin==temp->passGestor){
             
-                    printf("Login feito com sucesso\nEscolha a operacao:\n1->Criar Gestor: \n2->Remover Gestor:\n3->Alterar Gestor:\n4->Remover Cliente: "); 
+                    printf("Login feito com sucesso\nEscolha a operacao:\n1->Criar Gestor:\n2->Remover Gestor:"
+                    "\n3->Alterar Gestor:\n4->Remover Cliente:\n5->Obter Informacao dos clientes:\n6->Adicionar Meio de Mobilizacao:"
+                    "\n7->Remover Meio de Mobilizacao:\n8-> Localizar Meio de Mobilizacao:\n9->Alterar Meios de Mobilizacao"); 
                     scanf("%d",&gest);
+                    system("cls"); // para eliminar os prints anteriores
+    
                     break;
                 }
                 temp=temp->seguinte;
@@ -56,27 +72,60 @@ int main(){
                 printf("PassWord ou Nome de utilizador Invalidos!");
             }
            
- /**
- * @brief Implementacao de um Menu para os Gestores
- * 
- */
+            /**
+             * @brief Implementacao de um Menu para os Gestores
+             * 
+             */
             switch(gest){
+
+                // criar Gestor
                 case 1:
                     criarGestor(&Gestores);
                 break;
 
+                // remover Gestor
                 case 2:
                     removerGestor(&Gestores);
                 break;
 
+                // alterar Gestor
                 case 3:
                     alterarGestor(&Gestores);
                 break;
 
+                // Remover Cliente
                 case 4:
                     removerCliente(&Clientes);
                 break;
 
+                // Informacao dos clientes
+                case 5:
+                    infoClientes(Clientes);
+                break;
+
+                // Adicionar meio
+                case 6:
+                    acrescentarMeio(&Meios);;
+                break;
+
+                // Remover meio
+                case 7: 
+                    removerMeio(&Meios);
+                break;
+            
+                //Localizar meio
+                case 8:
+                    localizarMeio(Meios);
+                break; 
+
+                //Alterar meio
+                case 9:
+                    alterarMeio(&Meios);
+                break; 
+
+                default:
+                    printf("Erro");
+                break;
             }
         break;
 
@@ -88,6 +137,8 @@ int main(){
             scanf("%s",login);
             printf("Indique a pass: ");
             scanf("%d",&passLogin);
+            system("cls"); // para eliminar os prints anteriores
+    
  
             // percorrer a lista dos Clientes
             while(tempCliente!=NULL){
@@ -95,6 +146,7 @@ int main(){
 
                     printf("Login feito com sucesso!\nEscolha a operacao:\n1->Apagar Conta:\n2->Alugar Meio de Mobilizacao:\n3->Consultar saldo:");
                     scanf("%d",&opCliente);
+                    system("cls"); // para eliminar os prints anteriores
                     break; // para sair do while
                 }
                 tempCliente=tempCliente->seguinte;
@@ -103,10 +155,10 @@ int main(){
                 printf("PassWord ou Nome de utilizador Invalidos!");
             }
 
-/**
- * @brief Implementacao de um Menu para os clientes
- * 
-*/
+            /**
+            * @brief Implementacao de um Menu para os clientes
+            * 
+            */
             switch(opCliente){
                 
                 // Apagar Conta
@@ -117,7 +169,7 @@ int main(){
 
                 // Alugar meio
                 case 2:
-
+                    alugarMeio(Meios,&Clientes,login);
                 break;
 
                 // Consultar Saldo/Acrescentar saldo
@@ -125,17 +177,26 @@ int main(){
                     acrescentarSaldo(&Clientes,login);
                 break;
 
+                default:
+                    printf("Erro");
+                break;
+
             }
         break;
 
-/**
-* @brief para os utilizadores novos e dada a opcao de criar conta
-* 
-*/
+        /**
+        * @brief para os utilizadores novos e dada a opcao de criar conta
+        * 
+        */
         case 3:
         // Criar Conta para os clientes 
             criarCliente(&Clientes);
         break;
+
+        default:
+            printf("Erro");
+        break;
     }
+
     return 0;
 }

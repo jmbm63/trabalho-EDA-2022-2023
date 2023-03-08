@@ -28,9 +28,9 @@ struct gestor{
     struct gestor* seguinte;
 };
 
-struct maquinas{
+struct meios{
 
-    char meios[10]; // meios de mobilizacao
+    char meios[50]; // meios de mobilizacao
 
     int bateria;
 
@@ -40,5 +40,7 @@ struct maquinas{
     
     char localizacao[25];
 
-    struct maquinas* seguinte;
+    char estado[10];
+
+    struct meios* seguinte;
 };

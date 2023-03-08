@@ -4,42 +4,58 @@
 #include "struct.h"
 #include "gestores.h"
 #include "clientes.h"
+#include "meio.h"
 
-// leitura do ficheiro e insercao na lista ligada
+/**
+ * @brief Leitura do ficheiro e insercao dos dados na lista
+ * 
+ * @param Gestores 
+ * @return * leitura 
+ */
 void readFile(struct gestor** Gestores){
     FILE *file;
     file = fopen("dados Gestores.txt", "r");
 
-    struct gestor *nodo = malloc(sizeof(struct gestor)); // inicio da lista    
-    *Gestores = nodo; // atribuicao do primeiro nodo
+    struct gestor *anterior=NULL;
 
-    char linha[20];
+    char linha[100];
     char *token;
 
     if (file == NULL) {
         printf("Erro na abertura do ficheiro");
         exit(1);
     }
-    while (!feof(file)){
+    while (fgets(linha,sizeof(linha),file)!=NULL){
 
-        fscanf(file,"%s",linha);
+        struct gestor *nodo = malloc(sizeof(struct gestor)); // inicio da lista
+
         token=strtok(linha,";");
         strcpy(nodo->nomeGestor, token);
         printf("%s;",nodo->nomeGestor);
 
-        fscanf(file,"%s",linha);
-        token=strtok(linha,";");
+
+        token=strtok(NULL,";");
         nodo->passGestor=atoi(token);
         printf("%d\n",nodo->passGestor);
 
-        nodo->seguinte = malloc(sizeof(struct gestor));
-        nodo = nodo->seguinte;        
+        nodo->seguinte = NULL;
+
+        if(anterior==NULL){
+            *Gestores=nodo; // coloca o primeiro nodo 
+        }else{
+            anterior->seguinte=nodo;// liga o nodo anterior ao atual
+        }
+        anterior=nodo;// atualiza o elemento anterior        
     }
-    nodo->seguinte = NULL;
+    
     fclose(file);
 }
 
-// atualizaçao do ficheiro de texto
+/**
+ * @brief atualizaçao do ficheiro de texto quando há uma alteracao na lista 
+ * 
+ * @param Gestores 
+ */
 void atualizarFicheiro(struct gestor** Gestores){
 
     FILE* file;
@@ -53,14 +69,21 @@ void atualizarFicheiro(struct gestor** Gestores){
     struct gestor*nodo=*Gestores; // inicio da lista
 
     while(!feof(file) && nodo!=NULL){
-        fprintf(file,"%s;\n%d;\n",nodo->nomeGestor,nodo->passGestor);
+        fprintf(file,"%s;%d;\n",nodo->nomeGestor,nodo->passGestor);
         nodo=nodo->seguinte;
     }
 
     fclose(file);
 }
 
-// criar um novo gestor
+
+/**
+ * @brief Criacao de um novo gestor
+ *        Apenas um gestor pode criar outro gestor
+ * 
+ * @param Gestores 
+ */
+
 void criarGestor(struct gestor** Gestores){
 
    
@@ -71,51 +94,38 @@ void criarGestor(struct gestor** Gestores){
     int passTemp;  // password do utilizador a criar
 
     printf("Qual é o nome do novo gestor: ");
-    scanf("%s",nomeTemp);
+    getchar();
+    gets(nomeTemp);
     printf("Indique a sua password: ");
     scanf("%d",&passTemp);
 
+    // acrescentar a frente
     strcpy(nodo->nomeGestor,nomeTemp);
     nodo->passGestor = passTemp;
+
+    // coloca nodo seguinte como referencia
     nodo->seguinte = *Gestores;
     
+    // move nodo inicial para o acabado de incluir
     *Gestores = nodo;
 
     atualizarFicheiro(Gestores);
 }
 
-// Remover gestor
+
+/**
+ * @brief Remocao de um gestor
+ * 
+ * @param Gestores 
+ */
 void removerGestor(struct gestor** Gestores){
 
     char nomeRemover[50]; // nome a remover
 
     printf("\nQual é o gestor que pretende remover? ");
-    scanf("%s", nomeRemover);
+    getchar();
+    gets(nomeRemover);
 
-    /* struct gestor* temp = *Gestores;// leva me para o inicio da lista
-    while(temp!=NULL){// percorre a lista -> confirmação que os dados estao sendo inseridos
-
-        printf("Este PRINT%s;%d;\n",temp->nomeGestor,temp->passGestor);
-        temp=temp->seguinte;
-
-    }  
-     // percorre a lista e procura pelo gestor a ser removido
-    while(nodo!=NULL){
-        printf("1::::::%s\n",nodo->nomeGestor);
-        // se o nodo atual ja for o gestor a ser eliminado
-        if(strcmp(nodo->nomeGestor,nomeRemover)==0){
-            printf("2::::::%s\n",nodo->nomeGestor);
-            *Gestores=nodo->seguinte;
-            free(nodo);
-            return;
-           
-        }
-        printf("3::::::%s\n",nodo->nomeGestor);
-        //anterior=nodo;
-        nodo=nodo->seguinte;
-    }*/
-
-    
     struct gestor* Temp;
 
     if(strcmp((*Gestores)->nomeGestor,nomeRemover)==0){
@@ -143,8 +153,12 @@ void removerGestor(struct gestor** Gestores){
     atualizarFicheiro(Gestores);
 }
 
-
-// alterar informacao de um gestor
+/**
+ * @brief alteracao de um gestor
+ *        Qualquer gestor pode alterar a informacao de um outro gestor
+ * 
+ * @param Gestores 
+ */
 void alterarGestor(struct gestor** Gestores){
 
     struct gestor*nodo=*Gestores;
@@ -157,13 +171,15 @@ void alterarGestor(struct gestor** Gestores){
     printf("O que pretende fazer:\n1->alterar nome:\n2->alterar password:");
     scanf("%d",&operacao);
 
-    switch (operacao){
+    switch (operacao){ // nao é boa pratica
 
         // Alterar nome do gestor
         case 1:
 
             printf("Qual é o nome do gestor que prentede alterar:");
-            scanf("%s",nomeRemover);
+            getchar();
+            gets(nomeRemover);
+            
             printf("Qual é o novo nome:");
             scanf("%s",novoNome);
 
@@ -186,7 +202,8 @@ void alterarGestor(struct gestor** Gestores){
         // alterar a Password
         case 2:
             printf("Qual é a password do gestor que prentede alterar:");
-            scanf("%s",nomeRemover);
+            getchar();
+            gets(nomeRemover);
             printf("Qual é a nova pass:");
             scanf("%d",&novaPass);
 
@@ -200,13 +217,20 @@ void alterarGestor(struct gestor** Gestores){
     atualizarFicheiro(Gestores);
 }  
     
-// remover um clientes
+
+/**
+ * @brief remocao de um cliente da lista
+ * 
+ * @param Clientes 
+ */
 void removerCliente(struct cliente** Clientes){
 
     char clienteRemover[50];
 
     printf("\nCliente a remover:");
-    scanf("%s",clienteRemover);
+    getchar();
+    gets(clienteRemover);
+    
 
     struct cliente* temp;
     
@@ -228,16 +252,228 @@ void removerCliente(struct cliente** Clientes){
             nodo=nodo->seguinte;
         }
     }
-
-    // Imprimir a lista atualizada
-/*      struct cliente* ala = *Clientes;
-    while(ala!=NULL){
-        printf("\n%s;\n%d;\n%.2f;\n%d;\n%s;",ala->nomeCliente,ala->passCliente,ala->saldo,ala->nif,ala->morada);
-        ala=ala->seguinte;
-    }  */
-     
     atualizarFicheiroCliente(Clientes);
 } 
     
 
+/**
+* @brief funcao que permite aos gestores obter a informacao sobre os clientes
+* 
+* @param Clientes 
+*/
+void infoClientes(struct cliente* Clientes){
 
+    //struct clientes* nodo=Clientes;
+    int escolha;
+    char clientePesquisar[70];
+
+    printf("1->Escolher apenas 1 Cliente:\n2->Obter a lista de todos os Clientes:");
+    scanf("%d",&escolha);
+
+    switch(escolha){
+        case 1:
+            printf("Qual é o Cliente que pretende pesquisar: ");
+            getchar();
+            gets(clientePesquisar);
+
+            while(Clientes!=NULL){
+                if(strcmp(clientePesquisar,Clientes->nomeCliente)==0){
+                    printf("Nome:%s\nPassWord:%d\nSaldo:%.2f\nNif:%d\nMorada:%s\n",Clientes->nomeCliente,Clientes->passCliente,Clientes->saldo,Clientes->nif,Clientes->morada);
+                }
+                Clientes=Clientes->seguinte;
+            }
+        break;
+
+        case 2:
+            while(Clientes!=NULL){
+                printf("%s;%d;%.2f;%d,%s\n",Clientes->nomeCliente,Clientes->passCliente,Clientes->saldo,Clientes->nif,Clientes->morada);
+                Clientes=Clientes->seguinte;
+            }
+        break;
+    }  
+}
+
+/**
+ * @brief funcao que permite ao gestor acrescentar um meio de mobilidade
+ * 
+ * @param Meios 
+ */
+
+void acrescentarMeio(struct meios** Meios){
+
+    struct meios* nodo=malloc(sizeof(struct meios));
+
+    //variaveis auxilizares
+    int autonomiaNova;
+    int bateria=100;
+    float precoNovo;
+    char localizacaoNova[70],meioNovo[70];
+
+    //assumindo que ao acrescentar um meio de mobilizacao a sua bateria estara nos 100%
+    printf("Introduza as seguintes Informacoes:\n1->Nome do meio:");
+    getchar();
+    gets(meioNovo);
+    printf("2->Preco:");
+    scanf("%f",&precoNovo);
+    printf("3->autonomia:");
+    scanf("%d",&autonomiaNova);
+    printf("4->Localizacao do meio:");
+    getchar();
+    gets(localizacaoNova);
+    
+    system("cls");
+
+    //atribuicao das variaveis na lista ligada
+    // acrescentar a frente
+
+    strcpy(nodo->meios,meioNovo);
+    nodo->bateria=bateria;
+    nodo->preco=precoNovo;
+    nodo->autonomia=autonomiaNova;
+    strcpy(nodo->localizacao,localizacaoNova);
+
+    // colocar o nodo seguinte como ref
+    nodo->seguinte=(*Meios);
+
+    // move o nodo inicial para o acabado de acrescentar
+    (*Meios)=nodo;
+
+
+    ordemDecrescente(Meios); // Para voltar a ordenar a lista ligada por ordem decrescente de autonomia
+    atualizarFicheiroMeios(Meios);
+}
+
+
+/**
+ * @brief Percorre a lista ligada, se encontrar o meio pretendido entao retorna a informacao da localizacao
+ * 
+ * @param Meios 
+ */
+void localizarMeio(struct meios* Meios){
+    struct meios* nodo=Meios;
+
+    char meio_a_Localizar[70];
+
+    printf("Qual e o Meio que pretende Localizar:");
+    scanf("%s",meio_a_Localizar);
+
+    while(nodo!=NULL){
+ 
+        if(strcmp(meio_a_Localizar,nodo->meios)==0){
+            printf("A localizacao da %s e %s",nodo->meios,nodo->localizacao);
+        }
+
+       // printf("A localizacao da %s e %s\n",nodo->meios,nodo->localizacao);
+        nodo=nodo->seguinte;
+        //printf("ola\n");
+    }
+}
+
+/**
+ * @brief remover meio de mobilizacao
+ * 
+ * @param Meios 
+ */
+
+void removerMeio(struct meios** Meios){
+
+    struct meios* nodo=*Meios;
+    struct meios* temp;
+    char meioRemover[70];
+
+
+    printf("Qual e o meio que pretende remover: ");
+    getchar();
+    gets(meioRemover);
+
+    
+    if(strcmp((*Meios)->meios,meioRemover)==0){
+        temp=*Meios;
+        *Meios=(*Meios)->seguinte;
+        free(temp);
+    }else{
+        while(nodo->seguinte!=NULL){
+
+            if(strcmp(nodo->seguinte->meios,meioRemover)==0){
+
+                temp=nodo->seguinte;
+                nodo->seguinte=nodo->seguinte->seguinte;
+                free(temp);
+            }
+            nodo=nodo->seguinte;
+        }
+    }
+
+    ordemDecrescente(Meios);// Para ordenar a lista por ordem decrescente novamente
+    atualizarFicheiroMeios(Meios);
+}
+
+
+
+
+/**
+ * @brief alterar meio de mobilizacao
+ * 
+ * @param Meios 
+ */
+void alterarMeio(struct meios** Meios){
+
+    struct meios* nodo=*Meios;
+    int alteracao,novoPreco;
+    char meioAlterar[70],novoMeio[70],localizacaoNova[70];
+
+
+    printf("Pretende alterar:\n1->Nome do Meio:\n2->preco:\n3->Localizacao:");
+    scanf("%d",&alteracao);
+
+    switch (alteracao)
+    {
+        case 1:
+        
+            printf("Nome do meio a alterar:");
+            getchar();
+            gets(meioAlterar);
+            printf("Novo nome:");
+            getchar();
+            gets(meioAlterar);    
+
+            while(nodo!=NULL){
+                if(strcmp(nodo->meios,meioAlterar)==0){
+                    strcpy(nodo->meios,meioAlterar);
+                }
+                nodo=nodo->seguinte;
+            }
+        break;
+        case 2:
+            printf("Nome do meio a alterar:");
+            getchar();
+            gets(meioAlterar);
+            printf("Novo Preco:");
+            scanf("%d",&novoPreco);
+
+            while(nodo!=NULL){
+                if(strcmp(nodo->meios,meioAlterar)==0){
+                nodo->preco=novoPreco;
+                }
+                nodo=nodo->seguinte;
+            }
+        break;
+
+    case 3:
+            printf("Nome do meio a alterar:");
+            getchar();
+            gets(meioAlterar);
+            printf("Localizacao Nova:");
+            getchar();
+            gets(localizacaoNova);
+
+            while(nodo!=NULL){
+                if(strcmp(nodo->localizacao,localizacaoNova)==0){
+                strcpy(nodo->localizacao,localizacaoNova);
+                }
+                nodo=nodo->seguinte;
+            }
+        break;
+    }
+    atualizarFicheiroMeios(Meios);
+}

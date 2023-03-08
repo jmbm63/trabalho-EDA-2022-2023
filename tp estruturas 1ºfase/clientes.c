@@ -3,6 +3,7 @@
 #include <string.h>
 #include "struct.h"
 #include "gestores.h"
+#include "meio.h"
 
 /**
  * @brief Funcao de abertura do ficheiro de texto referente aos Clientes
@@ -16,10 +17,10 @@ void abrirFicheiro(struct cliente** Clientes){
     FILE* file;
     file=fopen("dados Cliente.txt","r");
 
-    struct cliente* nodo = malloc(sizeof(struct cliente)); // alocar dinamicamente um novo nodo na memoria    
-    *Clientes = nodo;
+    
+    struct cliente* anterior=NULL;
 
-    char linha[20];
+    char linha[100];
     char *token;
 
     if (file==NULL){
@@ -27,42 +28,50 @@ void abrirFicheiro(struct cliente** Clientes){
         exit(1);
     }
 
-    while(!feof(file)){
+    while(fgets(linha,sizeof(linha),file)!=NULL){
     
+        struct cliente* nodo = malloc(sizeof(struct cliente)); // alocar dinamicamente um novo nodo na memoria    
+
         // nome de utilizador
-        fscanf(file,"%s",linha);
+
         token=strtok(linha,";");
         strcpy(nodo->nomeCliente, token);
         printf("\nutilizador: %s\n",nodo->nomeCliente);
 
         // password
-        fscanf(file,"%s",linha);
-        token=strtok(linha,";");
+        
+        token=strtok(NULL,";");
         nodo->passCliente=atoi(token);
         printf("pass: %d\n",nodo->passCliente);
 
         // saldo da conta
-        fscanf(file,"%s",linha);
-        token=strtok(linha,";");
-        nodo->saldo=atoi(token);
+        
+        token=strtok(NULL,";");
+        nodo->saldo=atof(token);
         printf("saldo: %.2f\n",nodo->saldo);
 
         // NIF
-        fscanf(file,"%s",linha);
-        token=strtok(linha,";");
+        
+        token=strtok(NULL,";");
         nodo->nif=atoi(token);
         printf("nif: %d\n",nodo->nif);
 
         // morada
-        fscanf(file,"%s",linha);
-        token=strtok(linha,";");
+        
+        token=strtok(NULL,";");
         strcpy(nodo->morada, token);
         printf("morada: %s\n",nodo->morada);
 
-        nodo->seguinte = malloc(sizeof(struct cliente));
-        nodo = nodo->seguinte;        
+        nodo->seguinte = NULL;
+
+        if(anterior==NULL){
+            *Clientes=nodo; // coloca o primeiro nodo 
+        }else{
+            anterior->seguinte=nodo;// liga o nodo anterior ao atual
+        }
+        anterior=nodo;// atualiza o elemento anterior     
     }
-    nodo->seguinte = NULL;
+    
     fclose(file);
 }
 
@@ -79,15 +88,12 @@ void atualizarFicheiroCliente(struct cliente** Clientes){
     FILE* file;
     file=fopen("dados Cliente.txt","w");
 
-    char *token;
-    char linha[20];
-
     // escrever no ficheiro
 
     struct cliente* novo=*Clientes; // inicio da lista
 
     while(novo!=NULL){
-        fprintf(file,"%s;\n%d;\n%.2f;\n%d;\n%s;\n",novo->nomeCliente,novo->passCliente,novo->saldo,novo->nif,novo->morada);
+        fprintf(file,"%s;%d;%.2f;%d;%s;\n",novo->nomeCliente,novo->passCliente,novo->saldo,novo->nif,novo->morada);
         novo=novo->seguinte;
     }
 
@@ -115,13 +121,17 @@ void criarCliente(struct cliente** Clientes){
     int saldo = 0; // inicializado a zero, depois tera uma nova função para acrescentar saldo
 
     printf("\nQual é o seu nome: ");
-    scanf("%s",nomeNovo_Cliente);
+    getchar();
+    gets(nomeNovo_Cliente);
     printf("Indique a sua password: ");
     scanf("%d",&passNova_Cliente);
     printf("Qual é o sua morada: ");
-    scanf("%s",moradaNova);
+    getchar();
+    gets(moradaNova);
     printf("NIF: ");
     scanf("%d",&nif_Novo);
+    system("cls"); // para eliminar os prints anteriores
+    
 
     strcpy(nodo->nomeCliente,nomeNovo_Cliente);
     nodo->passCliente = passNova_Cliente;
@@ -186,6 +196,8 @@ void acrescentarSaldo(struct cliente ** Clientes,char* login){
     
     printf("Coloque a quantia: ");
     scanf("%d",&saldoAcrescentado);
+    system("cls"); // para eliminar os prints anteriores
+    
 
     struct cliente* nodo=*Clientes;
 
@@ -198,4 +210,79 @@ void acrescentarSaldo(struct cliente ** Clientes,char* login){
 
   
     atualizarFicheiroCliente(Clientes);
+}
+
+// ALTERAR CLIENTE
+void escreverFicheiroHistorico(struct meios* Meios,struct cliente** Clientes, char* alugado,char *login){
+   
+    
+    FILE* file;
+    file=fopen("historico.txt","a");
+
+    // escrever no ficheiro
+
+    struct cliente* novo= *Clientes; // inicio da lista
+    struct meios* nodo= Meios;
+
+    while(nodo!=NULL){
+        if(strcmp(alugado,nodo->meios)==0 ){
+            while(novo!=NULL){
+                if(strcmp(login,novo->nomeCliente) ==0){
+                    fprintf(file,"%s;%d;%s;\n",novo->nomeCliente,novo->nif,nodo->meios);
+                }
+                novo=novo->seguinte;
+            }
+        }
+        nodo=nodo->seguinte;
+    }
+    fclose(file);
+}
+
+
+/**
+ * @brief funcao utilizada para o cliente alugar um meio
+ * ele inicialmente irá mostrar todos os 
+ * 
+ * @param Meios 
+ * @param Clientes 
+ * @param login 
+ */
+void alugarMeio(struct meios* Meios,struct cliente** Clientes, char* login){
+
+    struct cliente* temp=*Clientes;
+    struct meios* nodo=Meios;
+    char meio_para_alugar[70];
+
+
+    while(nodo!=NULL){
+        if(strcmp(nodo->estado,"livre")==0){
+    
+            printf("Meio: %s; Bateria: %d; Preco: %.2f; Autonomia: %d; localizacao: %s\n",nodo->meios,
+            nodo->bateria,nodo->preco,nodo->autonomia,nodo->localizacao);
+            
+        }
+        nodo=nodo->seguinte;
+    }
+    
+
+    printf("Qual é o meio que pretende alugar?");
+    scanf("%s", meio_para_alugar);
+
+    while(temp!=NULL){
+        nodo = Meios;
+        if(strcmp(login,temp->nomeCliente)==0){
+            while(nodo!=NULL){
+                if(strcmp(meio_para_alugar,nodo->meios)==0){
+                    temp->saldo-=nodo->preco;
+                    strcpy(nodo->estado,"ocupado");
+                    break;
+                }
+                nodo=nodo->seguinte;
+            } 
+        }
+        temp=temp->seguinte;
+    }
+   escreverFicheiroHistorico(Meios,Clientes,meio_para_alugar,login);
+   atualizarFicheiroCliente(Clientes);
+   atualizarFicheiroMeios(&Meios);
 }

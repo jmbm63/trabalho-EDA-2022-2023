@@ -3,3 +3,4 @@ void criarCliente(struct cliente** Clientes);
 void atualizarFicheiroCliente(struct cliente** Clientes);
 void apagarConta(struct cliente** Clientes,char *login  ); 
 void acrescentarSaldo(struct cliente ** Clientes,char* login);
+void alugarMeio(struct meios* Meios,struct cliente**Clientes, char*login);

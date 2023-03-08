@@ -1,0 +1,9 @@
+scotter5;100;23.00;100;casa;ocupado;
+bicicleta2;100;0.15;60;animal;ocupado;
+bicicleta7;100;0.15;55;talho;ocupado;
+bicicleta1;100;0.15;40;ola;ocupado;
+bicicleta3;100;2.00;30;cavalo;ocupado;
+bicicleta5;2;0.15;24;sas;ocupado;
+scotter;100;2.00;15;loja;ocupado;
+trotinete2;100;0.15;15;burro;ocupado;
+trotinete1;100;0.15;5;casa;livre;
