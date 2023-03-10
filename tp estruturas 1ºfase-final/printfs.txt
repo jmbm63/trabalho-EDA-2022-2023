@@ -1,0 +1,21 @@
+Printfs clientes
+printf("\nutilizador: %s\n",nodo->nomeCliente);
+printf("pass: %d\n",nodo->passCliente);
+printf("saldo: %.2f\n",nodo->saldo);
+printf("nif: %d\n",nodo->nif);
+printf("morada: %s\n",nodo->morada);
+
+______________________________________
+Printfs Gestores
+printf("%s;",nodo->nomeGestor);
+printf("%d\n",nodo->passGestor);
+
+
+_______________________________________
+Printfs Meios
+printf("%s;",nodo->meios);
+printf("%d;",nodo->bateria);
+printf("%.2f;",nodo->preco);
+printf("%d;",nodo->autonomia);
+printf("%s;",nodo->localizacao);
+printf("%s;\n",nodo->estado);

@@ -1,0 +1,7 @@
+Coral;2111;20.00;231231231;Rua dos biscainhos;
+Jorge;2121;177.00;123412345;rua mm;
+Manel;2312;2.00;234234234;Rua do cavalo;
+sosia;2323;1.00;123456789;Rua da belha;
+Miguel;4444;-101.00;253951860;Rua da Corredoura;
+Miguela;4444;23.00;253951320;Rua;
+ze;4444;23.00;253951120;Rua da Corredouras;
