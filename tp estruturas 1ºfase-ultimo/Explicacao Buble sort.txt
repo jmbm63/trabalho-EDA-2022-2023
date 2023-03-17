@@ -1,0 +1,7 @@
+Esta função em C ordena uma lista ligada de estruturas meios em ordem decrescente de acordo com o valor da autonomia de cada meio.
+
+A função utiliza o algoritmo Bubble Sort para percorrer a lista e comparar a autonomia de cada meio com a autonomia do meio seguinte. Se a autonomia do meio atual for menor do que a autonomia do meio seguinte, os conteúdos das duas estruturas são trocados. Isso é feito para garantir que a estrutura com a maior autonomia esteja no início da lista.
+
+Além de trocar a autonomia, a função também troca o valor dos outros campos da estrutura, incluindo o nome do meio de transporte, a bateria, o preço, a localização e o estado.
+
+Ao final da execução, a lista estará ordenada em ordem decrescente de acordo com a autonomia de cada meio de transporte.

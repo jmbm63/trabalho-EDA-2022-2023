@@ -1,0 +1,10 @@
+void readFile(struct gestor** Gestores);
+void criarGestor(struct gestor** Gestores);
+void removerGestor(struct gestor** Gestores);
+void alterarGestor(struct gestor** Gestores);
+void removerCliente(struct cliente**Clientes);
+void infoClientes(struct cliente* Clientes);
+void acrescentarMeio(struct meios** Meios);
+void localizarMeio(struct meios* Meios);
+void removerMeio(struct meios** Meios);
+void alterarMeio(struct meios** Meios);

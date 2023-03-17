@@ -1,0 +1,9 @@
+tesla;90;100.00;200;fiado.mostrem.ajudem;livre;
+scotter5;90;23.00;100;chegar.prega.perde;ocupado;
+bicicleta7;40;1.00;55;ponto.talha.luas;livre;
+bicicleta1;100;1.00;40;ponto.talha.luas;livre;
+bicicleta5;2;22.00;32;solda.urso.teste;ocupado;
+bicicleta3;80;2.00;30;abordam.pratinho.rimar;ocupado;
+scotter;90;2.00;15;pitada.bati.frango;ocupado;
+trotinete2;90;12.00;15;linha.foge.corado;ocupado;
+trotinete1;90;2.00;5;linha.foge.corado;ocupado;
